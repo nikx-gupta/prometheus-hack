@@ -20,7 +20,7 @@ var (
 )
 var (
 	customer10_fetch_time_gauge = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "postgresapi_customer10_fetch_time",
+		Name: "postgresapi_customer10_fetch_sec",
 		Help: "Fetching 10 Customers Time",
 	})
 )
@@ -73,7 +73,7 @@ func ConnectHandler(handler func(w http.ResponseWriter, r *http.Request)) http.H
 			}
 		})
 
-		db_connection_time_gauge.Set(tm.Seconds())
+		db_connection_time_gauge.Set(float64(tm.Milliseconds()))
 		handler(w, r)
 	})
 }
