@@ -15,7 +15,7 @@ type Customer struct {
 }
 
 type CustomerRepo struct {
-	db *sql.DB
+	db     *sql.DB
 	output io.Writer
 }
 
@@ -46,7 +46,7 @@ func (c *CustomerRepo) Get(pageIndex int, pageSize int) error {
 }
 
 func AddPaging(s string, pageIndex int, pageSize int) string {
-	if  pageSize <= 0 {
+	if pageSize <= 0 {
 		pageSize = 10
 	}
 
@@ -54,5 +54,5 @@ func AddPaging(s string, pageIndex int, pageSize int) string {
 		pageIndex = 1
 	}
 
-	return fmt.Sprintf("%s OFFSET %d rows fetch next %d rows only",s, (pageIndex - 1) * pageSize, pageSize)
+	return fmt.Sprintf("%s OFFSET %d rows fetch next %d rows only", s, (pageIndex-1)*pageSize, pageSize)
 }
