@@ -3,12 +3,13 @@ package postgresapi
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
+	"time"
+
 	_ "github.com/lib/pq"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"net/http"
-	"time"
 )
 
 var db *sql.DB
@@ -27,6 +28,9 @@ var (
 
 func Run() {
 	http.Handle("/metrics", promhttp.Handler())
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("ok"))
+	})
 
 	http.Handle("/connect", ConnectHandler(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Connected"))
