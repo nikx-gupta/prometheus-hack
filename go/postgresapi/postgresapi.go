@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"os"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -63,7 +64,8 @@ func ConnectHandler(handler func(w http.ResponseWriter, r *http.Request)) http.H
 		}
 
 		tm := TimeOperation("Opening Connection", func() {
-			psqlconn := fmt.Sprintf("host=localhost user=nikx password=demo@123 dbname=postgres sslmode=disable")
+			// psqlconn := fmt.Sprintf("host=localhost user=nikx password=demo@123 dbname=postgres sslmode=disable")
+			psqlconn := os.Getenv("postgres_conn")
 			var err error
 			db, err = sql.Open("postgres", psqlconn)
 			if err != nil {
@@ -85,7 +87,7 @@ func ConnectHandler(handler func(w http.ResponseWriter, r *http.Request)) http.H
 func TimeOperation(msg string, targetFunc func()) time.Duration {
 	st := time.Now()
 	targetFunc()
-	et := time.Now().Sub(st)
+	et := time.Since(st)
 	fmt.Printf("%s: Time: %s\n", msg, et)
 
 	return et

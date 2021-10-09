@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresapi-deploy
+  labels:
+    app: postgresapi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: postgresapi
+  template:
+    metadata:
+      labels:
+        app: postgresapi
+    spec:
+      containers:
+        - name: postgresapi
+          image: nikxgupta/postgresapi:v1
+          imagePullPolicy: Always
+          env:
+          - name: postgres_conn
+            value: "host=postgres-server user=postgres password=demo@123 dbname=postgres sslmode=disable"
+          resources:
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresapi-svc
+spec:
+  selector:
+    app: postgresapi
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 12112
+      targetPort: 2112
+
+  
