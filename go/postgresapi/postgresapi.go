@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	_ "github.com/lib/pq"
@@ -21,10 +22,10 @@ var (
 	})
 )
 var (
-	customer10_fetch_time_gauge = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "postgresapi_customer10_fetch_sec",
+	customer_fetch_time_gauge = promauto.NewGaugeVec(prometheus.GaugeOpts{
+		Name: "postgresapi_customer_fetch_sec",
 		Help: "Fetching 10 Customers Time",
-	})
+	}, []string{"page_index", "page_size"})
 )
 
 func Run() {
@@ -38,15 +39,17 @@ func Run() {
 	}))
 
 	http.Handle("/customer/get", ConnectHandler(func(w http.ResponseWriter, r *http.Request) {
-		tm := TimeOperation("Fetch 10 Customers", func() {
+		pi, _ := strconv.Atoi(r.URL.Query().Get("pi"))
+		ps, _ := strconv.Atoi(r.URL.Query().Get("ps"))
+		tm := TimeOperation(fmt.Sprintf("Fetch %d Customers", pi * ps), func() {
 			repo := &CustomerRepo{db: db, output: w}
-			err := repo.Get(1, 10)
+			err := repo.Get(pi, ps)
 			if err != nil {
 				panic(err)
 			}
 		})
 
-		customer10_fetch_time_gauge.Set(tm.Seconds())
+		customer_fetch_time_gauge.WithLabelValues(fmt.Sprint(pi), fmt.Sprint(ps)).Set(tm.Seconds())
 	}))
 
 	fmt.Println("Starting listening on 2112")
@@ -64,8 +67,12 @@ func ConnectHandler(handler func(w http.ResponseWriter, r *http.Request)) http.H
 		}
 
 		tm := TimeOperation("Opening Connection", func() {
-			// psqlconn := fmt.Sprintf("host=localhost user=nikx password=demo@123 dbname=postgres sslmode=disable")
-			psqlconn := os.Getenv("postgres_conn")
+			var psqlconn string
+			if psqlconn = os.Getenv("postgres_conn"); psqlconn == "" {
+				psqlconn = "host=10.1.232.147 user=postgres password=demo@123 dbname=postgres sslmode=disable"
+			}
+
+			fmt.Printf("Connection: %s", psqlconn)
 			var err error
 			db, err = sql.Open("postgres", psqlconn)
 			if err != nil {

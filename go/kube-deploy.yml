@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: postgresapi
-          image: nikxgupta/postgresapi:v1
+          image: nikxgupta/postgresapi:v2
           imagePullPolicy: Always
           env:
           - name: postgres_conn
