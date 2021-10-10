@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/andybalholm/brotli v1.0.3 // indirect
+	github.com/denisenkom/go-mssqldb v0.11.0
 	github.com/fasthttp/router v1.4.3
 	github.com/google/uuid v1.3.0
 	github.com/klauspost/compress v1.13.6 // indirect
