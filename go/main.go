@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
+	_ "github.com/denisenkom/go-mssqldb"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"net/http"
 	"prometheus-hack/postgresapi"
 	"prometheus-hack/sqlapi"
-	_ "github.com/denisenkom/go-mssqldb"
 )
 
 func main() {
